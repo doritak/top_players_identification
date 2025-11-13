@@ -25,7 +25,8 @@ def load_data(path):
 
 club_top = load_data(path = "data/club_top.csv")
 players_list = load_data(path = "data/players_list.csv")
-
+club_top = club_top.rename(
+    columns={"Vereinsname":"Club Name","Cant_Goal":"Total Goals", "Cant_Player":"Total Players"})
 club_top = deepcopy(club_top)
 players_list = deepcopy(players_list)
 
@@ -49,13 +50,15 @@ st.write("# Teams (Vereins)")
 st.write("### Here are the listed the Football Groups.")
 st.write(club_top)
 
-club_top_sorted = club_top.sort_values(by="Cant_Player")
+club_top_sorted = club_top.sort_values(by="Total Players")
+
+
 fig = go.Figure(
     data=[
         go.Bar(
-            x=club_top_sorted["Vereinsname"], 
-            y=club_top_sorted["Cant_Goal"],
-            customdata=club_top_sorted[["Cant_Player"]],
+            x=club_top_sorted["Club Name"], 
+            y=club_top_sorted["Total Goals"],
+            customdata=club_top_sorted[["Total Players"]],
             marker=dict(color="lightblue"), 
             hovertemplate="<b>%{x}</b><br> Goals:%{y}<br> Players:%{customdata[0]}"
         )])

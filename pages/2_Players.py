@@ -39,7 +39,7 @@ list_position = (players_list["Position"]
                  .str.strip()
                  .dropna()
                  .unique())
-print(list_position)
+
 
 list_Liga = (players_list["Liga"]
                  .str.split(",")
@@ -70,8 +70,41 @@ st.write("### Here are only listed players from B and C  Junior League.")
 
 st.write(players_list)
 players_list['Efficency']=round(players_list['Goals']/players_list['Minutes'],2)
+# st.write(list_Liga)
 
-fig = px.scatter(players_list, x= "Minutes", y="Goals", color="Efficency", 
+# i make a map sex, so we can see Man/Women statt M/W
+sex_map = {
+    "All": "All",
+    "M": "Men",
+    "W": "Women"
+}
+
+# divide width
+left_col, middle_col, right_col = st.columns([2,2,1])
+# Making the 3 selectbox (popup) 
+
+ligas = ["All"] + sorted(list_Liga)
+liga = left_col.selectbox("Choose a League", ligas)
+
+positions = ["All"] + sorted(list_position)
+pos = middle_col.selectbox("Choose a Position", positions)
+
+sex_display = right_col.selectbox("Choose the sex", list(sex_map.values()))
+sex = [k for k, v in sex_map.items() if v == sex_display][0]
+
+reduced_df = players_list.copy()
+
+if liga != "All":
+    reduced_df = players_list[players_list["Liga"].str.contains(liga, case=False, na=False)]
+
+if pos != "All":
+    reduced_df = reduced_df[reduced_df["Position"].str.contains(pos, case=False, na=False)]
+
+if sex != "All":
+    reduced_df = reduced_df[reduced_df["Sex"] == sex]
+
+#Graphic with the reduced_df
+fig = px.scatter(reduced_df, x= "Minutes", y="Goals", color="Efficency", 
                  custom_data=players_list[["Vereinsname"]],
                  hover_name="Id-Player")
 
