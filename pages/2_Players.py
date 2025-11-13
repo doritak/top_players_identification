@@ -72,5 +72,15 @@ st.write(players_list)
 players_list['Efficency']=round(players_list['Goals']/players_list['Minutes'],2)
 
 fig = px.scatter(players_list, x= "Minutes", y="Goals", color="Efficency", 
+                 custom_data=players_list[["Vereinsname"]],
                  hover_name="Id-Player")
+
+fig.update_traces(
+    hovertemplate=
+    "<b>Id Player:</b> %{hovertext}<br>" +
+    "<b>Club:</b> %{customdata[0]}<br>" +
+    "<b>Minutes:</b> %{x}<br>" +
+    "<b>Goals:</b> %{y}<br>" +
+    "<extra></extra>"
+)
 st.plotly_chart(fig)
