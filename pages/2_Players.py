@@ -7,7 +7,6 @@ from urllib.request import urlopen
 import json
 from copy import deepcopy
 
-
 st.write("# Players")
 
 
@@ -107,16 +106,20 @@ st.write(reduced_df)
 
 
 #Graphic with the reduced_df
-fig = px.scatter(reduced_df, x= "Minutes", y="Goals", color="Efficency", 
-                 custom_data=players_list[["Vereinsname"]],
-                 hover_name="Id-Player", 
-                 opacity=0.5,
-                 color_continuous_scale=["blue", "red","yellow"])
+if "scatter_key" not in st.session_state:
+    st.session_state.scatter_key = "players_scatter_1"
+    
+fig = px.scatter(reduced_df, 
+                 x= "Minutes", y="Goals", color="Efficency", 
+                 custom_data = ["Id-Player", "Vereinsname"],
+                 hover_name = "Id-Player", 
+                 opacity = 0.5,
+                 color_continuous_scale = ["blue", "red","yellow"])
 
 fig.update_traces(
     hovertemplate=
-    "<b>Id Player:</b> %{hovertext}<br>" +
-    "<b>Club:</b> %{customdata[0]}<br>" +
+    "<b>Id Player:</b> %{customdata[0]}<br>" +
+    "<b>Club:</b> %{customdata[1]}<br>" +
     "<b>Minutes:</b> %{x}<br>" +
     "<b>Goals:</b> %{y}<br>" +
     "<extra></extra>"
@@ -127,4 +130,36 @@ fig.update_traces(
         line=dict(width=0.5, color="white")
     )
 )
-st.plotly_chart(fig)
+
+#Capturar el click del usuario y dibuja el gráfico
+event  = st.plotly_chart(
+    fig,
+    key=st.session_state.scatter_key,
+    on_select="rerun",        # la app se vuelve a ejecutar al seleccionar
+    selection_mode="points"   # selección de puntos
+    )
+
+###########===================################
+#Buscar al jugador en el event.selection y mostrar el resumen
+if event and event.selection and event.selection["points"]:
+    pt = event.selection["points"][0]
+    id_player = pt["customdata"][0]   # "Id-Player"
+
+    player_row = reduced_df[reduced_df["Id-Player"] == id_player].iloc[0]
+
+    st.markdown("### Player summary")
+    st.markdown(
+        f"""
+        **Id-Player:** {player_row['Id-Player']}  
+        **Club:** {player_row['Vereinsname']}  
+        **Minutes:** ⏱️ {player_row['Minutes']}  
+        **Goals:** ⚽ {player_row['Goals']}  
+        **Efficiency:** {player_row['Efficency']}
+        """
+    )
+    
+###########===================################
+# --- botón de reset debajo ---
+    if st.button("Reset selection"):
+        st.session_state.scatter_key = f"players_scatter_{pd.Timestamp.now().timestamp()}"
+        st.rerun()
