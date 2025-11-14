@@ -113,9 +113,9 @@ left_col,  right_col = st.columns(2)
 # Making the 2 selectbox (popup)
 #titles and description
 
-left_col.write("### Players per League")
+left_col.write("### Clubs per League")
 right_col.write("### Players per Club")
-left_col.write("This chart displays how players are distributed across different leagues.")
+left_col.write("This chart displays how clubs are distributed across different leagues.")
 right_col.write("This chart show the distribution fo registered players across the selected club.")
 
 
