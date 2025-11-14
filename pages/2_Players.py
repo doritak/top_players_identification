@@ -68,7 +68,7 @@ if st.button("Click Me"):
 
 st.write("### Here are only listed players from B and C  Junior League.")
 
-st.write(players_list)
+
 players_list['Efficency']=round(players_list['Goals']/players_list['Minutes'],2)
 # st.write(list_Liga)
 
@@ -102,6 +102,9 @@ if pos != "All":
 
 if sex != "All":
     reduced_df = reduced_df[reduced_df["Sex"] == sex]
+
+st.write(reduced_df)
+
 
 #Graphic with the reduced_df
 fig = px.scatter(reduced_df, x= "Minutes", y="Goals", color="Efficency", 

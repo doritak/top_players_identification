@@ -154,7 +154,7 @@ fig_league = px.pie(
     values="Numbers_Players",
     title="Players per Liga",
 )
-
+st.write("\n")
 # to show this in the pie grafic
 col1, col2 = st.columns(2)
 with col1:
