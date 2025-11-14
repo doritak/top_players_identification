@@ -72,10 +72,40 @@ fig.update_layout(
     
 # )
 st.plotly_chart(fig)
+st.markdown("<hr style='border: 2px solid orange;'>", unsafe_allow_html=True)
+# The best player per Team is...     
+player_df = players_list.copy()
 
+st.write("Select the team to see the best player score")
+left_col_player,  right_col_player = st.columns(2)
+
+clubs_player = ["Best for All"] + sorted(pd.unique(player_df["Vereinsname"]))
+club_pl = left_col_player.selectbox("Choose the Club", clubs_player)
+
+max_goals =player_df["Goals"].max()
+best_player = player_df[player_df["Goals"] == max_goals]
+
+if club_pl != "Best for All":
+    player_df = player_df[player_df["Vereinsname"] == club_pl]
+    max_goals =player_df["Goals"].max()
+    best_player = player_df[player_df["Goals"] == max_goals]
+    
+    
+right_col_player.write(f"The best scoring Player hat the id-Player: {best_player['Id-Player'].iloc[0]} \
+             and has {best_player['Goals'].iloc[0]} goals and plays \
+             for the club {best_player['Vereinsname'].iloc[0]} with {best_player['Minutes'].iloc[0]} minutes. ")
+    
+st.markdown("<hr style='border: 2px solid orange;'>", unsafe_allow_html=True)
 # divide width columns in windows
 left_col,  right_col = st.columns(2)
 # Making the 2 selectbox (popup)
+#titles and description
+
+left_col.write("### Players per League")
+right_col.write("### Players per Club")
+left_col.write("This chart displays how players are distributed across different leagues.")
+right_col.write("This chart show the distribution fo registered players across the selected club.")
+
 
 ligas = ["All"] + sorted(list_Liga)
 liga = left_col.selectbox("Choose a League", ligas)
@@ -131,7 +161,14 @@ with col1:
     st.plotly_chart(fig_club, use_container_width=True)
 with col2:
     st.plotly_chart(fig_league, use_container_width=True)
-    
+
+
+
+
+
+
+
+
 
 url = "https://docs.google.com/document/d/1uNVnJkBDwP16nCIBTXuiEy7jOdy6IX_XVu9FLK9dn_k/edit?tab=t.0"
 st.markdown(f"[Click here for the Project Information](<{url}>)")
