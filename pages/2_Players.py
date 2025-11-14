@@ -110,6 +110,7 @@ st.write(reduced_df)
 fig = px.scatter(reduced_df, x= "Minutes", y="Goals", color="Efficency", 
                  custom_data=players_list[["Vereinsname"]],
                  hover_name="Id-Player", 
+                 opacity=0.5,
                  color_continuous_scale=["blue", "red","yellow"])
 
 fig.update_traces(
@@ -119,5 +120,11 @@ fig.update_traces(
     "<b>Minutes:</b> %{x}<br>" +
     "<b>Goals:</b> %{y}<br>" +
     "<extra></extra>"
+)
+fig.update_traces(
+    marker=dict(
+        size=6,
+        line=dict(width=0.5, color="white")
+    )
 )
 st.plotly_chart(fig)
