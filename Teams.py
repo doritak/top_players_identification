@@ -154,6 +154,10 @@ fig_club = px.pie(
     title="Players per Club",
 )
 
+fig_club.update_traces(
+    hovertemplate="%{label}<br>Players: %{value}<br>Percent: %{percent}"
+)
+
 # jugadores por liga
 players_per_league = (
     reduced_df["Liga"]
@@ -161,6 +165,7 @@ players_per_league = (
     .reset_index()
 )
 players_per_league.columns = ["League", "Numbers_Players"]
+
 
 fig_league = px.pie(
     players_per_league,
@@ -170,18 +175,9 @@ fig_league = px.pie(
 )
 num_items = len(fig_league.data[0].labels)
 
-# fig_league.update_layout(
-#     legend=dict(
-#         orientation="h",
-#         x=0.5,
-#         y=0,
-#         xanchor="left",
-#         yanchor="top",
-#         font=dict(size=9)
-#     ),
-#     margin=dict(l=40, r=220, t=60, b=40),  # margen derecho grande para que quepa
-#     height=600 
-# )
+fig_league.update_traces(
+    hovertemplate="%{label}<br>Players: %{value}<br>Percent: %{percent}"
+)
 
 
 if num_items <= 6:
