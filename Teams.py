@@ -85,7 +85,7 @@ st.markdown("<hr style='border: 2px solid orange;'>", unsafe_allow_html=True)
 # The best player per Team is...     
 player_df = players_list.copy()
 
-st.write("Select the team to see the best player score")
+st.markdown("**Select a team to see the team’s top scorer**")
 left_col_player,  right_col_player = st.columns(2)
 
 clubs_player = ["Best for All"] + sorted(pd.unique(player_df["Vereinsname"]))
@@ -101,11 +101,31 @@ if club_pl != "Best for All":
     
     
 right_col_player.write(f"The best scoring Player hat the id-Player: {best_player['Id-Player'].iloc[0]} \
-             and has {best_player['Goals'].iloc[0]} goals and plays \
+             and has {best_player['Goals'].iloc[0]} goals ⚽ and plays \
              for the club {best_player['Vereinsname'].iloc[0]} with {best_player['Minutes'].iloc[0]} minutes. ")
 
 ###############=====================####################
+st.markdown("<hr style='border: 2px solid orange;'>", unsafe_allow_html=True)
+player_df_min = players_list.copy()
+st.markdown("**Select a team to view the player who played the most minutes.**")
+left_col_min,  right_col_min = st.columns(2)
 
+clubs_player_min = ["Top Minutes Player"] + sorted(pd.unique(player_df_min["Vereinsname"]))
+player_max_min = left_col_min.selectbox("Choose one Club", clubs_player_min)
+
+max_min = player_df_min["Minutes"].max()
+max_player = player_df_min[player_df_min["Minutes"] == max_min]
+
+if player_max_min != "Top Minutes Player":
+    player_df_min = player_df_min[player_df_min["Vereinsname"] == player_max_min]
+    max_min =player_df_min["Minutes"].max()
+    max_player = player_df_min[player_df_min["Minutes"] == max_min]
+    
+right_col_min.write(f"The player with the most minutes played has the Id-Player:\
+                    {max_player['Id-Player'].iloc[0]} and has played \
+                    {max_player['Minutes'].iloc[0]} minutes⏱️, und \
+                    has score {max_player['Goals'].iloc[0]} Goals 🥅.")
+    
 ###############=====================####################    
 st.markdown("<hr style='border: 2px solid orange;'>", unsafe_allow_html=True)
 # divide width columns in windows
