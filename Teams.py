@@ -73,6 +73,66 @@ fig.update_layout(
 # )
 st.plotly_chart(fig)
 
+# divide width columns in windows
+left_col,  right_col = st.columns(2)
+# Making the 2 selectbox (popup)
+
+ligas = ["All"] + sorted(list_Liga)
+liga = left_col.selectbox("Choose a League", ligas)
+
+clubs = ["All"] + sorted(pd.unique(players_list["Vereinsname"]))
+club = right_col.selectbox("Choose a Club", clubs)
+
+reduced_df = players_list.copy()
+
+if liga != "All":
+    reduced_df = reduced_df[reduced_df["Liga"].str.contains(liga, case=False, na=False)]
+
+if club != "All":
+    reduced_df = reduced_df[reduced_df["Vereinsname"] == club]
+
+if reduced_df.empty:
+    st.warning("No hay jugadores para ese filtro.")
+    st.stop()
+
+# aqui busco los players por cada club
+players_per_club = (
+    reduced_df["Vereinsname"]
+    .value_counts()
+    .reset_index()
+)
+players_per_club.columns = ["Club", "Numbers_Players"]
+
+fig_club = px.pie(
+    players_per_club,
+    names="Club",
+    values="Numbers_Players",
+    title="Players per Club",
+)
+
+# jugadores por liga
+players_per_league = (
+    reduced_df["Liga"]
+    .value_counts()
+    .reset_index()
+)
+players_per_league.columns = ["League", "Numbers_Players"]
+
+fig_league = px.pie(
+    players_per_league,
+    names="League",
+    values="Numbers_Players",
+    title="Players per Liga",
+)
+
+# to show this in the pie grafic
+col1, col2 = st.columns(2)
+with col1:
+    st.plotly_chart(fig_club, use_container_width=True)
+with col2:
+    st.plotly_chart(fig_league, use_container_width=True)
+    
+
 url = "https://docs.google.com/document/d/1uNVnJkBDwP16nCIBTXuiEy7jOdy6IX_XVu9FLK9dn_k/edit?tab=t.0"
 st.markdown(f"[Click here for the Project Information](<{url}>)")
 
