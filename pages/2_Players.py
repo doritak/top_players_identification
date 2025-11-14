@@ -106,7 +106,8 @@ if sex != "All":
 #Graphic with the reduced_df
 fig = px.scatter(reduced_df, x= "Minutes", y="Goals", color="Efficency", 
                  custom_data=players_list[["Vereinsname"]],
-                 hover_name="Id-Player")
+                 hover_name="Id-Player", 
+                 color_continuous_scale=["blue", "red","yellow"])
 
 fig.update_traces(
     hovertemplate=
