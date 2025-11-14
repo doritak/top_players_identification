@@ -8,7 +8,6 @@ from urllib.request import urlopen
 import json
 from copy import deepcopy
 
-
 @st.cache_data
 def load_data(path):
     df = pd.read_csv(path)
@@ -49,7 +48,7 @@ list_Liga = (players_list["Liga"]
                  .dropna()
                  .unique())
 
-all_Ligas = (all_players["Liga"]
+all_Ligas = (all_players["Altersklasse"]
                  .str.split(",")
                  .explode()
                  .str.strip()
@@ -62,15 +61,16 @@ st.write(club_top)
 
 club_top_sorted = club_top.sort_values(by="Total Players")
 
-
+if "scatter_key" not in st.session_state:
+    st.session_state.scatter_key = "players_scatter_1"
 fig = go.Figure(
     data=[
         go.Bar(
             x=club_top_sorted["Club Name"], 
             y=club_top_sorted["Total Goals"],
-            customdata=club_top_sorted[["Total Players"]],
+            customdata = club_top_sorted[["Club Name", "Total Players"]],
             marker=dict(color="lightblue"), 
-            hovertemplate="<b>%{x}</b><br> Goals:%{y}<br> Players:%{customdata[0]}"
+            hovertemplate="<b>%{x}</b><br> Goals:%{y}<br> Players:%{customdata[1]}"
         )])
     
 fig.update_layout(
@@ -78,10 +78,37 @@ fig.update_layout(
     xaxis_title="Football Clubs",
     yaxis_title="Goals"
 )
-# fig.add_annotation(
+#Capturar el click del usuario y dibuja el gráfico
+event  = st.plotly_chart(
+    fig,
+    key=st.session_state.scatter_key,
+    on_select="rerun",        # la app se vuelve a ejecutar al seleccionar
+    selection_mode="points"   # selección de puntos
+    )
     
-# )
-st.plotly_chart(fig)
+##########===================################
+#Buscar al jugador en el event.selection y mostrar el resumen
+if event and event.selection and event.selection["points"]:
+    pt = event.selection["points"][0]
+      
+    club_name = pt["customdata"][0]
+    total_players = pt["customdata"][1]
+    club_row = club_top_sorted[club_top_sorted["Club Name"] == club_name].iloc[0]
+
+    st.markdown("### Club summary")
+    st.markdown(
+        f"""
+        **Club:** {club_row['Club Name']}  
+        **Total Goals:** ⚽{club_row['Total Goals']}  
+        **Total Players:** 🧑‍🤝‍🧑{total_players}  
+        **Altersklasses:**  {club_row['Altersklasse']}  
+        """
+    )
+    if st.button("Reset selection"):
+        st.session_state.scatter_key = f"players_scatter_{pd.Timestamp.now().timestamp()}"
+        st.rerun()
+# st.plotly_chart(fig)
+
 st.markdown("<hr style='border: 2px solid orange;'>", unsafe_allow_html=True)
 # The best player per Team is...     
 player_df = players_list.copy()
@@ -134,14 +161,14 @@ left_col,  right_col = st.columns(2)
 # Making the 2 selectbox (popup)
 #titles and description
 
-left_col.write("### Clubs per League")
+left_col.write("### The Altersklasse in each Club")
 right_col.write("### Players per Club")
-left_col.write("This chart displays how clubs are distributed across different leagues.")
+left_col.write("This chart displays how clubs are distributed across different Altersklasse.")
 right_col.write("This chart show the distribution fo registered players across the selected club.")
 
 
 ligas = ["All"] + sorted(all_Ligas)
-liga = left_col.selectbox("Choose a League", ligas)
+liga = left_col.selectbox("Choose a Altersklasse", ligas)
 
 clubs = ["All"] + sorted(pd.unique(all_players["Vereinsname"]))
 club = right_col.selectbox("Choose a Club", clubs)
@@ -149,7 +176,7 @@ club = right_col.selectbox("Choose a Club", clubs)
 reduced_df = all_players.copy()  # change this for all the players #reduced_df = players_list.copy()
 
 if liga != "All":
-    reduced_df = reduced_df[reduced_df["Liga"].str.contains(liga, case=False, na=False)]
+    reduced_df = reduced_df[reduced_df["Altersklasse"].str.contains(liga, case=False, na=False)]
 
 if club != "All":
     reduced_df = reduced_df[reduced_df["Vereinsname"] == club]
@@ -181,18 +208,18 @@ fig_club.update_traces(
 
 # jugadores por liga
 players_per_league = (
-    reduced_df["Liga"]
+    reduced_df["Altersklasse"]
     .value_counts()
     .reset_index()
 )
-players_per_league.columns = ["League", "Numbers_Players"]
+players_per_league.columns = ["Altersklasse", "Numbers_Players"]
 
 
 fig_league = px.pie(
     players_per_league,
-    names="League",
+    names="Altersklasse",
     values="Numbers_Players",
-    title="Players per Liga",
+    title="Players per Altersklasse",
 )
 num_items = len(fig_league.data[0].labels)
 
@@ -212,8 +239,8 @@ if num_items <= 6:
             yanchor="top",
             font=dict(size=10)
         ),
-        margin=dict(l=40, r=40, t=60, b=120),
-        height=450
+        # margin=dict(l=40, r=40, t=60, b=120),
+        # height=600
     )
 else:
     # Leyenda a la derecha si hay muchas categorías
@@ -226,8 +253,8 @@ else:
             yanchor="top",
             font=dict(size=9)
         ),
-        margin=dict(l=40, r=220, t=60, b=40),
-        height=600
+        # margin=dict(l=40, r=220, t=60, b=40),
+        # height=600
     )
 st.write("\n")
 

@@ -27,10 +27,8 @@ input::placeholder {
 
 
 
-club_top = load_data(path = "data/club_top.csv")
 players_list = load_data(path = "data/players_list.csv")
 
-club_top = deepcopy(club_top)
 players_list = deepcopy(players_list)
 
 list_position = (players_list["Position"]
@@ -48,10 +46,10 @@ list_position = (players_list["Position"]
 #                  .dropna()
 #                  .unique())
 
-list_Liga = np.array(['Juniorinnen B', 'Juniorinnen C',
-       'Junioren C 1. Stärkeklasse',
-       'Junioren C 2. Stärkeklasse', 'Junioren C Promotion', 'Youth League C'])
-
+list_Altersklasse = (players_list["Altersklasse"]
+                 .str.strip()
+                 .dropna()
+                 .unique())
 
 st.write("# Player identification")
 
@@ -71,7 +69,7 @@ if st.button("Click Me"):
         
         # st.write(chart_player) 
 
-st.write("### Here are only listed players from B and C  Junior League.")
+st.write("### Here are only listed players Information.")
 
 
 players_list['Efficency']=round(players_list['Goals']/players_list['Minutes'],2)
@@ -88,8 +86,8 @@ sex_map = {
 left_col, middle_col, right_col = st.columns([2,2,1])
 # Making the 3 selectbox (popup) 
 
-ligas = ["All"] + sorted(list_Liga)
-liga = left_col.selectbox("Choose a League", ligas)
+ligas = ["All"] + sorted(list_Altersklasse)
+liga = left_col.selectbox("Choose a Alterklasse", ligas)
 
 positions = ["All"] + sorted(list_position)
 pos = middle_col.selectbox("Choose a Position", positions)
@@ -100,7 +98,7 @@ sex = [k for k, v in sex_map.items() if v == sex_display][0]
 reduced_df = players_list.copy()
 
 if liga != "All":
-    reduced_df = players_list[players_list["Liga"].str.contains(liga, case=False, na=False)]
+    reduced_df = reduced_df[reduced_df["Altersklasse"]==liga]
 
 if pos != "All":
     reduced_df = reduced_df[reduced_df["Position"].str.contains(pos, case=False, na=False)]
