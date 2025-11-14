@@ -25,10 +25,13 @@ def load_data(path):
 
 club_top = load_data(path = "data/club_top.csv")
 players_list = load_data(path = "data/players_list.csv")
+all_players = load_data(path = "data/all_players.csv")
+
 club_top = club_top.rename(
     columns={"Vereinsname":"Club Name","Cant_Goal":"Total Goals", "Cant_Player":"Total Players"})
 club_top = deepcopy(club_top)
 players_list = deepcopy(players_list)
+all_players = deepcopy(all_players)
 
 list_position = (players_list["Position"]
                  .str.split(",")
@@ -45,6 +48,12 @@ list_Liga = (players_list["Liga"]
                  .dropna()
                  .unique())
 
+all_Ligas = (all_players["Liga"]
+                 .str.split(",")
+                 .explode()
+                 .str.strip()
+                 .dropna()
+                 .unique())
 
 st.write("# Teams (Vereins)")
 st.write("### Here are the listed the Football Groups.")
@@ -94,7 +103,10 @@ if club_pl != "Best for All":
 right_col_player.write(f"The best scoring Player hat the id-Player: {best_player['Id-Player'].iloc[0]} \
              and has {best_player['Goals'].iloc[0]} goals and plays \
              for the club {best_player['Vereinsname'].iloc[0]} with {best_player['Minutes'].iloc[0]} minutes. ")
-    
+
+###############=====================####################
+
+###############=====================####################    
 st.markdown("<hr style='border: 2px solid orange;'>", unsafe_allow_html=True)
 # divide width columns in windows
 left_col,  right_col = st.columns(2)
@@ -107,13 +119,13 @@ left_col.write("This chart displays how players are distributed across different
 right_col.write("This chart show the distribution fo registered players across the selected club.")
 
 
-ligas = ["All"] + sorted(list_Liga)
+ligas = ["All"] + sorted(all_Ligas)
 liga = left_col.selectbox("Choose a League", ligas)
 
-clubs = ["All"] + sorted(pd.unique(players_list["Vereinsname"]))
+clubs = ["All"] + sorted(pd.unique(all_players["Vereinsname"]))
 club = right_col.selectbox("Choose a Club", clubs)
 
-reduced_df = players_list.copy()
+reduced_df = all_players.copy()  # change this for all the players #reduced_df = players_list.copy()
 
 if liga != "All":
     reduced_df = reduced_df[reduced_df["Liga"].str.contains(liga, case=False, na=False)]
@@ -121,10 +133,12 @@ if liga != "All":
 if club != "All":
     reduced_df = reduced_df[reduced_df["Vereinsname"] == club]
 
+###############=====================####################
 if reduced_df.empty:
     st.warning("There are no filters for this player selection.")
     st.stop()
 
+###############=====================####################
 # aqui busco los players por cada club
 players_per_club = (
     reduced_df["Vereinsname"]
@@ -154,7 +168,52 @@ fig_league = px.pie(
     values="Numbers_Players",
     title="Players per Liga",
 )
+num_items = len(fig_league.data[0].labels)
+
+# fig_league.update_layout(
+#     legend=dict(
+#         orientation="h",
+#         x=0.5,
+#         y=0,
+#         xanchor="left",
+#         yanchor="top",
+#         font=dict(size=9)
+#     ),
+#     margin=dict(l=40, r=220, t=60, b=40),  # margen derecho grande para que quepa
+#     height=600 
+# )
+
+
+if num_items <= 6:
+    # Leyenda abajo si hay pocas categorías
+    fig_league.update_layout(
+        legend=dict(
+            orientation="v",
+            x=1.1,
+            y=1,
+            xanchor="left",
+            yanchor="top",
+            font=dict(size=10)
+        ),
+        margin=dict(l=40, r=40, t=60, b=120),
+        height=450
+    )
+else:
+    # Leyenda a la derecha si hay muchas categorías
+    fig_league.update_layout(
+        legend=dict(
+            orientation="h",
+            x=0.5,
+            y=0,
+            xanchor="left",
+            yanchor="top",
+            font=dict(size=9)
+        ),
+        margin=dict(l=40, r=220, t=60, b=40),
+        height=600
+    )
 st.write("\n")
+
 # to show this in the pie grafic
 col1, col2 = st.columns(2)
 with col1:
