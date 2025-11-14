@@ -92,7 +92,7 @@ if club != "All":
     reduced_df = reduced_df[reduced_df["Vereinsname"] == club]
 
 if reduced_df.empty:
-    st.warning("No hay jugadores para ese filtro.")
+    st.warning("There are no filters for this player selection.")
     st.stop()
 
 # aqui busco los players por cada club
