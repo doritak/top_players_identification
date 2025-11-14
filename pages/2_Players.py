@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+import numpy as np
 import matplotlib.pyplot as plt
 import plotly.express as px
 import plotly.graph_objects as go
@@ -40,12 +41,17 @@ list_position = (players_list["Position"]
                  .unique())
 
 
-list_Liga = (players_list["Liga"]
-                 .str.split(",")
-                 .explode()
-                 .str.strip()
-                 .dropna()
-                 .unique())
+# list_Liga = (players_list["Liga"]
+#                  .str.split(",")
+#                  .explode()
+#                  .str.strip()
+#                  .dropna()
+#                  .unique())
+
+list_Liga = np.array(['Juniorinnen B', 'Juniorinnen C',
+       'Junioren C 1. Stärkeklasse',
+       'Junioren C 2. Stärkeklasse', 'Junioren C Promotion', 'Youth League C'])
+
 
 st.write("# Player identification")
 
