@@ -8,7 +8,6 @@ from urllib.request import urlopen
 import json
 from copy import deepcopy
 
-@st.cache_data
 def load_data(path):
     df = pd.read_csv(path)
     return df

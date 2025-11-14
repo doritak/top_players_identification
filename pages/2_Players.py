@@ -11,7 +11,6 @@ from copy import deepcopy
 st.write("# Players")
 
 
-@st.cache_data
 def load_data(path):
     df = pd.read_csv(path)
     return df
